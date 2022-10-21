@@ -5,6 +5,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
+import pymysql
 
 
 load_dotenv()
