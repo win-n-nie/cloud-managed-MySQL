@@ -18,6 +18,7 @@ GCP_MYSQL_DATABASE = os.getenv("GCP_MYSQL_DATABASE")
 connection_string_gcp = f'mysql+pymysql://{GCP_MYSQL_USER}:{GCP_MYSQL_PASSWORD}@{GCP_MYSQL_HOSTNAME}:3306/{GCP_MYSQL_DATABASE}'
 db_gcp = create_engine(connection_string_gcp)
 
+
 table_patients = """
 create table if not exists patients (
     id int auto_increment,
@@ -43,11 +44,16 @@ create table if not exists medications (
 """
 
 table_treatments_procedures = """
+create table if not exists treatments/procedures (
+    id int auto_increment
+    
 
+
+);
 """
 
 table_conditions = """
-create table if not exists production_patient_conditions (
+create table if not exists patient_conditions (
     id int auto_increment,
     mrn varchar(255) default null,
     icd10_code varchar(255) default null,
@@ -58,5 +64,18 @@ create table if not exists production_patient_conditions (
 """
 
 table_social_determinants = """
-
+create table if not exists social_determinants(
+    id int auto_increment
+    edu_level varchar(255) default null
+    environment varchar(255) default null
+    food varchar (255) default null 
+    community varchar  (255) default null
+    PRIMARY KEY (id)
+);
 """
+
+db_gcp.execute(table_patients)
+db_gcp.execute(table_medications)
+db_gcp.execute(table_treatments_procedures)
+db_gcp.execute(table_conditions)
+db_gcp.execute(table_social_determinants)
