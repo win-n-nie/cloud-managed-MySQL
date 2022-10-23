@@ -11,7 +11,7 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
 fakeDataset = pd.DataFrame({'colors' : ['blue', 'purple', 'pink']})
-connection_string = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOSTNAME}:3305/{MYSQL_DATABASE}'
+connection_string = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOSTNAME}:3306/{MYSQL_DATABASE}'
 engine = create_engine(connection_string)
 TABLENAME = MYSQL_USER + 'Tablehw1'
 fakeDataset.to_sql(TABLENAME, con=engine)
