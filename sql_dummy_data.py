@@ -34,5 +34,15 @@ fake_patients = [
         'contact_mobile':fake.phone_number(),
         'contact_home':fake.phone_number()
     } for x in range(10)]
+df_fake_patients = pd.DataFrame(fake_patients)
 
+icd10codes = pd.read_csv('https://raw.githubusercontent.com/Bobrovskiy/ICD-10-CSV/master/2020/diagnosis.csv')
+list(icd10codes.columns)
+icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
+icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
+
+icd10codes = pd.read_csv('https://raw.githubusercontent.com/Bobrovskiy/ICD-10-CSV/master/2020/diagnosis.csv')
+list(icd10codes.columns)
+icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
+icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
 
