@@ -9,16 +9,14 @@ import os
 from faker import Faker
 import uuid
 import random 
+load_dotenv()
 
 GCP_MYSQL_HOSTNAME = os.getenv("GCP_MYSQL_HOSTNAME")
 GCP_MYSQL_USER = os.getenv("GCP_MYSQL_USERNAME")
 GCP_MYSQL_PASSWORD = os.getenv("GCP_MYSQL_PASSWORD")
 GCP_MYSQL_DATABASE = os.getenv("GCP_MYSQL_DATABASE")
-
 connection_string_gcp = f'mysql+pymysql://{GCP_MYSQL_USER}:{GCP_MYSQL_PASSWORD}@{GCP_MYSQL_HOSTNAME}:3306/{GCP_MYSQL_DATABASE}'
 db_gcp = create_engine(connection_string_gcp)
-
-print(db_gcp.table_names())
 
 fake = Faker()
 
@@ -35,6 +33,9 @@ fake_patients = [
         'contact_home':fake.phone_number()
     } for x in range(10)]
 df_fake_patients = pd.DataFrame(fake_patients)
+df_fake_patients = df_fake_patients.drop_duplicates(subset=['mrn'])
+
+
 
 icd10codes = pd.read_csv('https://raw.githubusercontent.com/Bobrovskiy/ICD-10-CSV/master/2020/diagnosis.csv')
 list(icd10codes.columns)

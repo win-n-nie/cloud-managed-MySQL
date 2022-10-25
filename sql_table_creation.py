@@ -15,6 +15,14 @@ GCP_MYSQL_USER = os.getenv("GCP_MYSQL_USERNAME")
 GCP_MYSQL_PASSWORD = os.getenv("GCP_MYSQL_PASSWORD")
 GCP_MYSQL_DATABASE = os.getenv("GCP_MYSQL_DATABASE")
 
+load_dotenv()
+MYSQL_HOSTNAME = os.getenv("MYSQL_HOSTNAME")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+connection_string = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOSTNAME}:3306/{MYSQL_DATABASE}'
+engine = create_engine(connection_string)
+
 connection_string_gcp = f'mysql+pymysql://{GCP_MYSQL_USER}:{GCP_MYSQL_PASSWORD}@{GCP_MYSQL_HOSTNAME}:3306/{GCP_MYSQL_DATABASE}'
 db_gcp = create_engine(connection_string_gcp)
 
@@ -58,24 +66,28 @@ create table if not exists patient_conditions (
     mrn varchar(255) default null,
     icd10_code varchar(255) default null,
     PRIMARY KEY (id),
-    FOREIGN KEY (mrn) REFERENCES production_patients(mrn) ON DELETE CASCADE,
-    FOREIGN KEY (icd10_code) REFERENCES production_conditions(icd10_code) ON DELETE CASCADE
+    FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE,
+    FOREIGN KEY (icd10_code) REFERENCES conditions(icd10_code) ON DELETE CASCADE
 ); 
 """
 
 table_social_determinants = """
 create table if not exists social_determinants(
-    id int auto_increment
-    edu_level varchar(255) default null
-    environment varchar(255) default null
-    food varchar (255) default null 
-    community varchar  (255) default null
+    id int auto_increment,
+    edu_level varchar(255) default null,
+    environment varchar(255) default null,
+    food varchar (255) default null,
+    community varchar  (255) default null,
     PRIMARY KEY (id)
 );
 """
 
 db_gcp.execute(table_patients)
-db_gcp.execute(table_medications)
+
+engine.execute(table_medications)
+
 db_gcp.execute(table_treatments_procedures)
-db_gcp.execute(table_conditions)
-db_gcp.execute(table_social_determinants)
+
+engine.execute(table_conditions)
+
+engine.execute(table_social_determinants)
