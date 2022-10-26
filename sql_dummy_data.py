@@ -75,18 +75,20 @@ for index, row in newCPTcode.iterrows():
     ## stop once we have 100 rows
     if startingRow == 60:
         break
+
+###LOINC
 loinc = pd.read_csv('/Users/wendyarias/Desktop/GitHub/cloud-managed-MySQL/Loinc.csv')
 list(loinc.columns)
 shortloinc= loinc[['LOINC_NUM', 'COMPONENT']]
 LOINCnew = shortloinc.sample(n=50)
-insertQuery = "INSERT INTO treatments_procedures (CPT_code, CPT_description) VALUES (%s, %s)"
+insertQuery = "INSERT INTO social_determinants (LOINC_NUM, COMPONENT) VALUES (%s, %s)"
 startingRow = 0
-for index, row in newCPTcode.iterrows():
+for index, row in LOINCnew.iterrows():
     startingRow += 1
     print('startingRow: ', startingRow)
     # db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
     print("inserted row db_azure: ", index)
-    engine.execute(insertQuery, (row['CPT_code'], row['CPT_description']))
+    engine.execute(insertQuery, (row['LOINC_NUM'], row['COMPONENT']))
     print("inserted row db_gcp: ", index)
     ## stop once we have 100 rows
     if startingRow == 60:
