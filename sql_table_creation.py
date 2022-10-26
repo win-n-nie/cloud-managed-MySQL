@@ -75,11 +75,9 @@ create table if not exists patient_conditions (
 table_social_determinants = """
 create table if not exists social_determinants(
     id int auto_increment,
-    CPT_code varchar(255) default null,
     LOINC_NUM varchar(255) default null,
     COMPONENT varchar(255) default null,
-    PRIMARY KEY (id),
-    FOREIGN KEY (CPT_code) REFRENENCES treatments_procedures(CPT_code) ON DELETE CASCADE
+    PRIMARY KEY (id)
 );
 """
 
