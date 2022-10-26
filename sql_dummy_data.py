@@ -18,6 +18,15 @@ GCP_MYSQL_DATABASE = os.getenv("GCP_MYSQL_DATABASE")
 connection_string_gcp = f'mysql+pymysql://{GCP_MYSQL_USER}:{GCP_MYSQL_PASSWORD}@{GCP_MYSQL_HOSTNAME}:3306/{GCP_MYSQL_DATABASE}'
 db_gcp = create_engine(connection_string_gcp)
 
+
+load_dotenv()
+MYSQL_HOSTNAME = os.getenv("MYSQL_HOSTNAME")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+connection_string = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOSTNAME}:3306/{MYSQL_DATABASE}'
+engine = create_engine(connection_string)
+
 fake = Faker()
 
 fake_patients = [
@@ -35,7 +44,11 @@ fake_patients = [
 df_fake_patients = pd.DataFrame(fake_patients)
 df_fake_patients = df_fake_patients.drop_duplicates(subset=['mrn'])
 
-
+#### real ndc codes
+ndc_codes = pd.read_csv('https://raw.githubusercontent.com/hantswilliams/FDA_NDC_CODES/main/NDC_2022_product.csv')
+ndc_codes_1k = ndc_codes.sample(n=1000, random_state=1)
+# drop duplicates from ndc_codes_1k
+ndc_codes_1k = ndc_codes_1k.drop_duplicates(subset=['PRODUCTNDC'], keep='first')
 
 icd10codes = pd.read_csv('https://raw.githubusercontent.com/Bobrovskiy/ICD-10-CSV/master/2020/diagnosis.csv')
 list(icd10codes.columns)
@@ -47,3 +60,43 @@ list(icd10codes.columns)
 icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
 icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
 
+
+### inserting fake data 
+insertQuery = "INSERT INTO patients (mrn, first_name, last_name, zip_code, dob, gender, contact_mobile, contact_home) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+for index, row in df_fake_patients.iterrows():
+
+    engine.execute(insertQuery, (row['mrn'], row['first_name'], row['last_name'], row['zip_code'], row['dob'], row['gender'], row['contact_mobile'], row['contact_home']))
+    print("inserted row: ", index)
+
+# # query dbs to see if data is there
+# df_azure = pd.read_sql_query("SELECT * FROM production_patients", db_azure)
+df_gcp = pd.read_sql_query("SELECT * FROM patients", engine)
+
+########## INSERTING IN FAKE MEDICATIONS ##########
+insertQuery = "INSERT INTO medications (med_ndc, med_human_name) VALUES (%s, %s)"
+
+medRowCount = 0
+for index, row in ndc_codes_1k.iterrows():
+    medRowCount += 1
+    # db_azure.execute(insertQuery, (row['PRODUCTNDC'], row['NONPROPRIETARYNAME']))
+    engine.execute(insertQuery, (row['PRODUCTNDC'], row['NONPROPRIETARYNAME']))
+    print("inserted row: ", index)
+    ## stop once we have 50 rows
+    if medRowCount == 75:
+        break
+
+insertQuery = "INSERT INTO patient_conditions (icd10_code, icd10_description) VALUES (%s, %s)"
+
+startingRow = 0
+for index, row in icd10codesShort_1k.iterrows():
+    startingRow += 1
+    print('startingRow: ', startingRow)
+    # db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
+    print("inserted row db_azure: ", index)
+    engine.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
+    print("inserted row db_gcp: ", index)
+    ## stop once we have 100 rows
+    if startingRow == 100:
+        break
