@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import dbm
+from hashlib import new
 import pandas as pd 
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -60,21 +61,47 @@ cptcodes = pd.read_csv('https://gist.githubusercontent.com/lieldulev/439793dc3c5
 list(cptcodes.columns)
 newCPTcode = cptcodes.rename(columns={'com.medigy.persist.reference.type.clincial.CPT.code':'CPT_code', 'label':'CPT_description'})
 newCPTcode.sample(n=100)
-insertQuery = "INSERT INTO patient_conditions (mrn, icd10_code) VALUES (%s, %s)"
 
+##treatment/procedure fake data
+insertQuery = "INSERT INTO treatments_procedures (CPT_code, CPT_description) VALUES (%s, %s)"
+startingRow = 0
+for index, row in newCPTcode.iterrows():
+    startingRow += 1
+    print('startingRow: ', startingRow)
+    # db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
+    print("inserted row db_azure: ", index)
+    engine.execute(insertQuery, (row['CPT_code'], row['CPT_description']))
+    print("inserted row db_gcp: ", index)
+    ## stop once we have 100 rows
+    if startingRow == 60:
+        break
+loinc = pd.read_csv('/Users/wendyarias/Desktop/GitHub/cloud-managed-MySQL/Loinc.csv')
+list(loinc.columns)
+shortloinc= loinc[['LOINC_NUM', 'COMPONENT']]
+LOINCnew = shortloinc.sample(n=50)
+insertQuery = "INSERT INTO treatments_procedures (CPT_code, CPT_description) VALUES (%s, %s)"
+startingRow = 0
+for index, row in newCPTcode.iterrows():
+    startingRow += 1
+    print('startingRow: ', startingRow)
+    # db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
+    print("inserted row db_azure: ", index)
+    engine.execute(insertQuery, (row['CPT_code'], row['CPT_description']))
+    print("inserted row db_gcp: ", index)
+    ## stop once we have 100 rows
+    if startingRow == 60:
+        break
 
 ### inserting fake data 
-insertQuery = "INSERT INTO treatments_procedures () VALUES (%s, %s)"
 
+insertQuery = "INSERT INTO patients (mrn, first_name, last_name, zip_code, dob, gender, contact_mobile, contact_home) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
 for index, row in df_fake_patients.iterrows():
 
     engine.execute(insertQuery, (row['mrn'], row['first_name'], row['last_name'], row['zip_code'], row['dob'], row['gender'], row['contact_mobile'], row['contact_home']))
     print("inserted row: ", index)
 
-# # query dbs to see if data is there
-# df_azure = pd.read_sql_query("SELECT * FROM production_patients", db_azure)
-df_gcp = pd.read_sql_query("SELECT * FROM patients", engine)
+
 
 ########## INSERTING IN FAKE MEDICATIONS ##########
 insertQuery = "INSERT INTO medications (med_ndc, med_human_name) VALUES (%s, %s)"

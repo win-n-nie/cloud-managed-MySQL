@@ -56,8 +56,9 @@ table_treatments_procedures = """
 create table if not exists treatments_procedures (
     id int auto_increment,
     mrn varchar(255) default null,
-    CPT_code varchar (255) default null,
-    CPT_description varchar (255) default null,
+    CPT_code varchar(255) default null,
+    CPT_description varchar(255) default null,
+    PRIMARY KEY (id),
     FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE
 );
 """
@@ -74,7 +75,11 @@ create table if not exists patient_conditions (
 table_social_determinants = """
 create table if not exists social_determinants(
     id int auto_increment,
-    
+    CPT_code varchar(255) default null,
+    LOINC_NUM varchar(255) default null,
+    COMPONENT varchar(255) default null,
+    PRIMARY KEY (id),
+    FOREIGN KEY (CPT_code) REFRENENCES treatments_procedures(CPT_code) ON DELETE CASCADE
 );
 """
 
