@@ -44,40 +44,37 @@ create table if not exists patients (
 table_medications = """
 create table if not exists medications (
     id int auto_increment,
+    mrn varchar(255) default null,
     med_ndc varchar(255) default null unique,
     med_human_name varchar(255) default null,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE
 ); 
 """
 
 table_treatments_procedures = """
-create table if not exists treatments/procedures (
-    id int auto_increment
-    
-
-
+create table if not exists treatments_procedures (
+    id int auto_increment,
+    mrn varchar(255) default null,
+    CPT_code varchar (255) default null,
+    CPT_description varchar (255) default null,
+    FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE
 );
 """
 
 table_conditions = """
 create table if not exists patient_conditions (
     id int auto_increment,
-    mrn varchar(255) default null,
-    icd10_code varchar(255) default null,
+    icd10_code varchar(255) default null unique,
     icd10_description varchar(255) default null,
-    PRIMARY KEY (id),
-    FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE
+    PRIMARY KEY (id) 
 ); 
 """
 
 table_social_determinants = """
 create table if not exists social_determinants(
     id int auto_increment,
-    edu_level varchar(255) default null,
-    environment varchar(255) default null,
-    food varchar (255) default null,
-    community varchar  (255) default null,
-    PRIMARY KEY (id)
+    
 );
 """
 
@@ -85,7 +82,7 @@ db_gcp.execute(table_patients)
 
 engine.execute(table_medications)
 
-db_gcp.execute(table_treatments_procedures)
+engine.execute(table_treatments_procedures)
 
 engine.execute(table_conditions)
 

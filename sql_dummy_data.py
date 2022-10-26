@@ -55,9 +55,16 @@ list(icd10codes.columns)
 icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
 icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
 
+### cpt codes
+cptcodes = pd.read_csv('https://gist.githubusercontent.com/lieldulev/439793dc3c5a6613b661c33d71fdd185/raw/25c3abcc5c24e640a0a5da1ee04198a824bf58fa/cpt4.csv')
+list(cptcodes.columns)
+newCPTcode = cptcodes.rename(columns={'com.medigy.persist.reference.type.clincial.CPT.code':'CPT_code', 'label':'CPT_description'})
+newCPTcode.sample(n=100)
+insertQuery = "INSERT INTO patient_conditions (mrn, icd10_code) VALUES (%s, %s)"
+
 
 ### inserting fake data 
-insertQuery = "INSERT INTO patients (mrn, first_name, last_name, zip_code, dob, gender, contact_mobile, contact_home) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+insertQuery = "INSERT INTO treatments_procedures () VALUES (%s, %s)"
 
 
 for index, row in df_fake_patients.iterrows():
