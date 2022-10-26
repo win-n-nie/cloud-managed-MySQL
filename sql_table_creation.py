@@ -46,7 +46,6 @@ create table if not exists medications (
     id int auto_increment,
     med_ndc varchar(255) default null unique,
     med_human_name varchar(255) default null,
-    med_is_dangerous varchar(255) default null,
     PRIMARY KEY (id)
 ); 
 """
@@ -65,6 +64,7 @@ create table if not exists patient_conditions (
     id int auto_increment,
     mrn varchar(255) default null,
     icd10_code varchar(255) default null,
+    icd10_description varchar(255) default null,
     PRIMARY KEY (id),
     FOREIGN KEY (mrn) REFERENCES patients(mrn) ON DELETE CASCADE
 ); 

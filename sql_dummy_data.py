@@ -55,11 +55,6 @@ list(icd10codes.columns)
 icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
 icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
 
-icd10codes = pd.read_csv('https://raw.githubusercontent.com/Bobrovskiy/ICD-10-CSV/master/2020/diagnosis.csv')
-list(icd10codes.columns)
-icd10codesShort = icd10codes[['CodeWithSeparator', 'ShortDescription']]
-icd10codesShort_1k = icd10codesShort.sample(n=1000, random_state=1)
-
 
 ### inserting fake data 
 insertQuery = "INSERT INTO patients (mrn, first_name, last_name, zip_code, dob, gender, contact_mobile, contact_home) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -87,6 +82,8 @@ for index, row in ndc_codes_1k.iterrows():
     if medRowCount == 75:
         break
 
+
+##patient conditions data
 insertQuery = "INSERT INTO patient_conditions (icd10_code, icd10_description) VALUES (%s, %s)"
 
 startingRow = 0
